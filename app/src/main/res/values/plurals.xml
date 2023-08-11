@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="capacity">
+        <item quantity="zero">Вместимость: %d пассажиров</item>
+        <item quantity="one">Вместимость: %d пассажир</item>
+        <item quantity="two">Вместимость: %d пассажира</item>
+        <item quantity="few">Вместимость: %d пассажира</item>
+        <item quantity="many">Вместимость: %d пассажиров</item>
+        <item quantity="other">Вместимость: %d пассажиров</item>
+    </plurals>
+</resources>

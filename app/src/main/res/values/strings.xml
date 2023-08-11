@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Star Wars</string>
+    <string name="loading_failed">Ошибка загрузки</string>
+    <string name="placeholder_result">Загруженные результаты</string>
+    <string name="retry">Повторить попытку</string>
+    <string name="loading">Загрузка</string>
+    <string name="starships">Звездолёты</string>
+    <string name="heroes">Персонажи</string>
+    <string name="planets">Планеты</string>
+    <string name="start_search">Введите 2 символа для начала поиска</string>
+    
+    <string name="model">Модель: %s</string>
+    <string name="manufacturer">Производитель: %s</string>
+    
+    <string name="not_available">н/д</string>
+</resources>
