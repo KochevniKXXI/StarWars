@@ -33,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.starwars.R
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,9 +50,7 @@ fun HomeScreen(
             query = query,
             onQueryChange = {
                 query = it
-                if (query.length >= 2) {
-                    viewModel.getStarshipByName(query)
-                }
+                viewModel.getStarshipByName(query)
             },
             onSearch = { active = false },
             active = active,
@@ -63,9 +60,9 @@ fun HomeScreen(
                     text = "${
                         stringResource(id = R.string.heroes)
                     }, ${
-                        stringResource(id = R.string.starships).lowercase(Locale.ROOT)
+                        stringResource(id = R.string.starships).lowercase()
                     }, ${
-                        stringResource(id = R.string.planets).lowercase(Locale.ROOT)
+                        stringResource(id = R.string.planets).lowercase()
                     }"
                 )
             },
@@ -75,7 +72,7 @@ fun HomeScreen(
                 is HomeUiState.StartSearch -> StartSearchBox()
                 is HomeUiState.Loading -> LoadingBox(modifier = modifier.fillMaxSize())
                 is HomeUiState.Success -> ResultBox(
-                    starships = homeUiState.starships,
+                    resources = homeUiState.starships,
                     modifier = modifier.fillMaxSize()
                 )
 
@@ -110,38 +107,121 @@ fun LoadingBox(modifier: Modifier = Modifier) {
 
 @Composable
 fun ResultBox(
-    starships: List<StarshipDetails>,
+    resources: List<ResourceDetails>,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(modifier = modifier) {
-        items(starships) { starship ->
-            var isFavorites by rememberSaveable { mutableStateOf(false) }
+    if (resources.isEmpty()) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = stringResource(R.string.no_results))
+        }
+    } else {
+        LazyColumn(modifier = modifier) {
+            items(resources) { resource ->
+                var isFavorites by rememberSaveable { mutableStateOf(false) }
 
-            ListItem(
-                headlineContent = { Text(text = starship.name) },
-                supportingContent = {
-                    Text(text = stringResource(id = R.string.model, starship.model))
-                    Text(text = stringResource(id = R.string.manufacturer, starship.manufacturer))
-                    Text(
-                        text = if (starship.passengers == null) stringResource(id = R.string.not_available)
-                        else pluralStringResource(
-                            id = R.plurals.capacity,
-                            count = starship.passengers,
-                            starship.passengers
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = when (resource) {
+                                is StarshipDetails -> resource.name
+                                is HeroDetails -> resource.name
+                                is PlanetDetails -> resource.name
+                                else -> ""
+                            }
+                        )
+                    },
+                    supportingContent = { ResourceSupportingContent(resource) },
+                    trailingContent = {
+                        IconButton(onClick = { isFavorites = !isFavorites }) {
+                            Icon(
+                                imageVector = if (isFavorites) Icons.Filled.Favorite
+                                else Icons.Outlined.FavoriteBorder,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                )
+                Divider()
+            }
+        }
+    }
+}
+
+@Composable
+private fun ResourceSupportingContent(
+    resource: ResourceDetails,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        when (resource) {
+            is StarshipDetails -> {
+                Text(text = stringResource(id = R.string.model, resource.model))
+                Text(text = stringResource(id = R.string.manufacturer, resource.manufacturer))
+                Text(
+                    text = stringResource(
+                        id = R.string.capacity,
+                        if (resource.passengers == null) {
+                            stringResource(id = R.string.not_available)
+                        } else {
+                            pluralStringResource(
+                                id = R.plurals.capacity,
+                                count = resource.passengers,
+                                resource.passengers
+                            )
+                        }
+                    )
+                )
+            }
+
+            is HeroDetails -> {
+                Text(text = stringResource(id = R.string.gender, resource.gender))
+                Text(
+                    text = stringResource(
+                        id = R.string.number_starships,
+                        pluralStringResource(
+                            id = R.plurals.number_starships,
+                            count = resource.numberStarships,
+                            resource.numberStarships
                         )
                     )
-                },
-                trailingContent = {
-                    IconButton(onClick = { isFavorites = !isFavorites }) {
-                        Icon(
-                            imageVector = if (isFavorites) Icons.Filled.Favorite
-                            else Icons.Outlined.FavoriteBorder,
-                            contentDescription = null
-                        )
-                    }
-                }
-            )
-            Divider()
+                )
+            }
+
+            is PlanetDetails -> {
+                Text(
+                    text = stringResource(
+                        id = R.string.diameter,
+                        if (resource.diameter == null) {
+                            stringResource(id = R.string.unknown)
+                        } else {
+                            pluralStringResource(
+                                id = R.plurals.diameter,
+                                count = resource.diameter,
+                                resource.diameter
+                            )
+                        }
+                    )
+                )
+                Text(
+                    text = stringResource(
+                        id = R.string.population,
+                        if (resource.population == null) {
+                            stringResource(id = R.string.unknown)
+                        } else {
+                            pluralStringResource(
+                                id = R.plurals.population,
+                                count = resource.population.toString().takeLast(2).toInt(),
+                                resource.population
+                            )
+                        }
+                    )
+                )
+            }
+
+            else -> {}
         }
     }
 }

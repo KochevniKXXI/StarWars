@@ -11,6 +11,13 @@
     
     <string name="model">Модель: %s</string>
     <string name="manufacturer">Производитель: %s</string>
-    
+    <string name="gender">"Пол: %s"</string>
+    <string name="number_starships">"Пилотировал: %s"</string>
+    <string name="diameter">Диаметр: %s</string>
+    <string name="population">Население: %s</string>
+    <string name="capacity">Вместимость: %s</string>
+
     <string name="not_available">н/д</string>
+    <string name="unknown">неизвестно</string>
+    <string name="no_results">По вашему запросу ничего не найдено</string>
 </resources>

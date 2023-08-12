@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="capacity">
-        <item quantity="zero">Вместимость: %d пассажиров</item>
-        <item quantity="one">Вместимость: %d пассажир</item>
-        <item quantity="two">Вместимость: %d пассажира</item>
-        <item quantity="few">Вместимость: %d пассажира</item>
-        <item quantity="many">Вместимость: %d пассажиров</item>
-        <item quantity="other">Вместимость: %d пассажиров</item>
+        <item quantity="zero">%d пассажиров</item>
+        <item quantity="one">%d пассажир</item>
+        <item quantity="two">%d пассажира</item>
+        <item quantity="few">%d пассажира</item>
+        <item quantity="many">%d пассажиров</item>
+        <item quantity="other">%d пассажиров</item>
+    </plurals>
+    <plurals name="number_starships">
+        <item quantity="zero">%d звездолётов</item>
+        <item quantity="one">%d звездолёт</item>
+        <item quantity="two">%d звездолёта</item>
+        <item quantity="few">%d звездолёта</item>
+        <item quantity="many">%d звездолётов</item>
+        <item quantity="other">%d звездолётов</item>
+    </plurals>
+    <plurals name="diameter">
+        <item quantity="zero">%d километров</item>
+        <item quantity="one">%d километр</item>
+        <item quantity="two">%d километра</item>
+        <item quantity="few">%d километра</item>
+        <item quantity="many">%d километров</item>
+        <item quantity="other">%d километров</item>
+    </plurals>
+    <plurals name="population">
+        <item quantity="zero">%d человек</item>
+        <item quantity="one">%d человек</item>
+        <item quantity="two">%d человека</item>
+        <item quantity="few">%d человек</item>
+        <item quantity="many">%d человек</item>
+        <item quantity="other">%d человек</item>
     </plurals>
 </resources>
