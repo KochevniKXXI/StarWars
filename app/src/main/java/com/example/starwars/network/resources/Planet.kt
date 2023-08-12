@@ -7,11 +7,13 @@ import kotlinx.serialization.Serializable
 data class Planet(
     val name: String,
     val diameter: String,
-    val population: String
+    val population: String,
+    override val url: String
 ) : Resource {
     override fun toResourceDetails() = PlanetDetails(
         name = name,
         diameter = diameter.toIntOrNull(),
-        population = population.toLongOrNull()
+        population = population.toLongOrNull(),
+        url = url
     )
 }

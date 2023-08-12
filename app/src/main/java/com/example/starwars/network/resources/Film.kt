@@ -7,11 +7,13 @@ import kotlinx.serialization.Serializable
 data class Film(
     val title: String,
     val director: String,
-    val producer: String
+    val producer: String,
+    override val url: String
 ) : Resource {
     override fun toResourceDetails() = FilmDetails(
         title = title,
         director = director,
-        producer = producer
+        producer = producer,
+        url = url
     )
 }

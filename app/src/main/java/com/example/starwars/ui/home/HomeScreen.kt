@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,6 +34,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.starwars.R
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,6 +46,7 @@ fun HomeScreen(
 
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     Box(modifier = modifier.fillMaxSize()) {
         SearchBar(
@@ -50,7 +54,10 @@ fun HomeScreen(
             query = query,
             onQueryChange = {
                 query = it
-                viewModel.getStarshipByName(query)
+                coroutineScope.coroutineContext.cancelChildren()
+                coroutineScope.launch {
+                    viewModel.getResourceByName(query)
+                }
             },
             onSearch = { active = false },
             active = active,
@@ -72,7 +79,8 @@ fun HomeScreen(
                 is HomeUiState.StartSearch -> StartSearchBox()
                 is HomeUiState.Loading -> LoadingBox(modifier = modifier.fillMaxSize())
                 is HomeUiState.Success -> ResultBox(
-                    resources = homeUiState.starships,
+                    resources = homeUiState.resources,
+                    onFavoriteClick = viewModel::updateFavoritesResources,
                     modifier = modifier.fillMaxSize()
                 )
 
@@ -108,6 +116,7 @@ fun LoadingBox(modifier: Modifier = Modifier) {
 @Composable
 fun ResultBox(
     resources: List<ResourceDetails>,
+    onFavoriteClick: (ResourceDetails) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (resources.isEmpty()) {
@@ -120,8 +129,6 @@ fun ResultBox(
     } else {
         LazyColumn(modifier = modifier) {
             items(resources) { resource ->
-                var isFavorites by rememberSaveable { mutableStateOf(false) }
-
                 ListItem(
                     headlineContent = {
                         Text(
@@ -135,9 +142,9 @@ fun ResultBox(
                     },
                     supportingContent = { ResourceSupportingContent(resource) },
                     trailingContent = {
-                        IconButton(onClick = { isFavorites = !isFavorites }) {
+                        IconButton(onClick = { onFavoriteClick(resource) }) {
                             Icon(
-                                imageVector = if (isFavorites) Icons.Filled.Favorite
+                                imageVector = if (resource.isFavorite) Icons.Filled.Favorite
                                 else Icons.Outlined.FavoriteBorder,
                                 contentDescription = null
                             )

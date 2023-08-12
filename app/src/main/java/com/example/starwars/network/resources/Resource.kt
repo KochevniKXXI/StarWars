@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable(with = ResourceSerializer::class)
 interface Resource {
+    val url: String
     fun toResourceDetails(): ResourceDetails
 }

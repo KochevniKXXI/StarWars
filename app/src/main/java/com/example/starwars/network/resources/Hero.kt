@@ -7,11 +7,13 @@ import kotlinx.serialization.Serializable
 data class Hero(
     val name: String,
     val gender: String,
-    val starships: List<String>
+    val starships: List<String>,
+    override val url: String
 ) : Resource {
     override fun toResourceDetails() = HeroDetails(
         name = name,
         gender = gender,
-        numberStarships = starships.size
+        numberStarships = starships.size,
+        url = url
     )
 }

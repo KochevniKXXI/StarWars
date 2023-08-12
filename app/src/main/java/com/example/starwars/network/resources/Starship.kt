@@ -8,12 +8,14 @@ data class Starship(
     val name: String,
     val model: String,
     val manufacturer: String,
-    val passengers: String
+    val passengers: String,
+    override val url: String
 ) : Resource {
     override fun toResourceDetails() = StarshipDetails(
         name = name,
         model = model,
         manufacturer = manufacturer,
-        passengers = passengers.toIntOrNull()
+        passengers = passengers.toIntOrNull(),
+        url = url
     )
 }
