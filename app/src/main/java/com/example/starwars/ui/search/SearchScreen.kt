@@ -1,23 +1,27 @@
-package com.example.starwars.ui.home
+package com.example.starwars.ui.search
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemColors
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,35 +32,41 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.starwars.R
+import com.example.starwars.ui.navigation.NavigationDestination
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 
+object SearchDestination : NavigationDestination {
+    override val route = "search_screen"
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
+fun SearchScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: SearchViewModel = hiltViewModel()
 ) {
 
+    val homeUiState = viewModel.homeUiState
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Column(modifier = modifier.fillMaxSize()) {
         SearchBar(
-            modifier = Modifier.align(Alignment.TopCenter),
+            modifier = Modifier.align(Alignment.CenterHorizontally),
             query = query,
             onQueryChange = {
                 query = it
                 coroutineScope.coroutineContext.cancelChildren()
                 coroutineScope.launch {
-                    viewModel.getResourceByName(query)
+                    viewModel.findResourcesByName(query)
                 }
             },
             onSearch = { active = false },
@@ -75,17 +85,34 @@ fun HomeScreen(
             },
             leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null) }
         ) {
-            when (val homeUiState = viewModel.homeUiState) {
+            when (homeUiState) {
                 is HomeUiState.StartSearch -> StartSearchBox()
-                is HomeUiState.Loading -> LoadingBox(modifier = modifier.fillMaxSize())
+                is HomeUiState.Loading -> LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                 is HomeUiState.Success -> ResultBox(
                     resources = homeUiState.resources,
-                    onFavoriteClick = viewModel::updateFavoritesResources,
+                    onFavoriteClick = viewModel::changeFavoritesResources,
                     modifier = modifier.fillMaxSize()
                 )
 
                 is HomeUiState.Error -> ErrorBox(modifier = modifier.fillMaxSize())
             }
+        }
+        when (homeUiState) {
+            is HomeUiState.StartSearch -> Box(modifier = Modifier.fillMaxSize())
+            is HomeUiState.Loading -> Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+
+            is HomeUiState.Success -> ResultBox(
+                resources = homeUiState.resources,
+                onFavoriteClick = viewModel::changeFavoritesResources,
+                modifier = modifier.fillMaxSize()
+            )
+
+            is HomeUiState.Error -> ErrorBox(modifier = modifier.fillMaxSize())
         }
     }
 }
@@ -100,17 +127,11 @@ fun ErrorBox(modifier: Modifier = Modifier) {
         Image(
             painter = painterResource(id = R.drawable.ic_connection_error), contentDescription = ""
         )
-        Text(text = stringResource(R.string.loading_failed), modifier = Modifier.padding(16.dp))
+        Text(
+            text = stringResource(R.string.loading_failed),
+            modifier = Modifier.padding(dimensionResource(R.dimen.medium_padding))
+        )
     }
-}
-
-@Composable
-fun LoadingBox(modifier: Modifier = Modifier) {
-    Image(
-        modifier = modifier.size(200.dp),
-        painter = painterResource(R.drawable.loading_img),
-        contentDescription = stringResource(R.string.loading)
-    )
 }
 
 @Composable
@@ -129,18 +150,8 @@ fun ResultBox(
     } else {
         LazyColumn(modifier = modifier) {
             items(resources) { resource ->
-                ListItem(
-                    headlineContent = {
-                        Text(
-                            text = when (resource) {
-                                is StarshipDetails -> resource.name
-                                is HeroDetails -> resource.name
-                                is PlanetDetails -> resource.name
-                                else -> ""
-                            }
-                        )
-                    },
-                    supportingContent = { ResourceSupportingContent(resource) },
+                ResourceListItem(
+                    resource = resource,
                     trailingContent = {
                         IconButton(onClick = { onFavoriteClick(resource) }) {
                             Icon(
@@ -155,6 +166,31 @@ fun ResultBox(
             }
         }
     }
+}
+
+@Composable
+fun ResourceListItem(
+    resource: ResourceDetails,
+    modifier: Modifier = Modifier,
+    trailingContent: @Composable (() -> Unit)? = null,
+    colors: ListItemColors = ListItemDefaults.colors()
+) {
+    ListItem(
+        modifier = modifier,
+        headlineContent = {
+            Text(
+                text = when (resource) {
+                    is StarshipDetails -> resource.name
+                    is HeroDetails -> resource.name
+                    is PlanetDetails -> resource.name
+                    else -> ""
+                }
+            )
+        },
+        supportingContent = { ResourceSupportingContent(resource) },
+        trailingContent = trailingContent,
+        colors = colors
+    )
 }
 
 @Composable
@@ -190,8 +226,8 @@ private fun ResourceSupportingContent(
                         id = R.string.number_starships,
                         pluralStringResource(
                             id = R.plurals.number_starships,
-                            count = resource.numberStarships,
-                            resource.numberStarships
+                            count = resource.starships.size,
+                            resource.starships.size
                         )
                     )
                 )

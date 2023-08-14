@@ -1,9 +1,11 @@
-package com.example.starwars.network.resources
+package com.example.starwars.data.model
 
-import com.example.starwars.ui.home.FilmDetails
+import com.example.starwars.ui.search.FilmDetails
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("film")
 data class Film(
     val title: String,
     val director: String,

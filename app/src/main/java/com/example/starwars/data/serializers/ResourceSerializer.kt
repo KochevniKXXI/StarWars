@@ -1,10 +1,10 @@
-package com.example.starwars.network
+package com.example.starwars.data.serializers
 
-import com.example.starwars.network.resources.Film
-import com.example.starwars.network.resources.Hero
-import com.example.starwars.network.resources.Planet
-import com.example.starwars.network.resources.Resource
-import com.example.starwars.network.resources.Starship
+import com.example.starwars.data.model.Film
+import com.example.starwars.data.model.Hero
+import com.example.starwars.data.model.Planet
+import com.example.starwars.data.model.Resource
+import com.example.starwars.data.model.Starship
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
@@ -12,7 +12,7 @@ import kotlinx.serialization.json.jsonObject
 object ResourceSerializer : JsonContentPolymorphicSerializer<Resource>(Resource::class) {
     override fun selectDeserializer(element: JsonElement) = when {
         "gender" in element.jsonObject -> Hero.serializer()
-        "starship_class" in element.jsonObject -> Starship.serializer()
+        "passengers" in element.jsonObject -> Starship.serializer()
         "diameter" in element.jsonObject -> Planet.serializer()
         else -> Film.serializer()
     }

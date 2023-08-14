@@ -1,4 +1,4 @@
-package com.example.starwars.ui.home
+package com.example.starwars.ui.search
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -7,10 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.starwars.data.StarWarsRepository
 import com.example.starwars.data.UserPreferencesRepository
+import com.example.starwars.data.model.Film
+import com.example.starwars.data.model.Hero
+import com.example.starwars.data.model.Planet
+import com.example.starwars.data.model.Resource
+import com.example.starwars.data.model.Starship
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
@@ -23,7 +27,7 @@ sealed interface HomeUiState {
 }
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class SearchViewModel @Inject constructor(
     private val starWarsRepository: StarWarsRepository,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
@@ -31,7 +35,7 @@ class HomeViewModel @Inject constructor(
     var homeUiState: HomeUiState by mutableStateOf(HomeUiState.StartSearch)
         private set
 
-    suspend fun getResourceByName(search: String) {
+    suspend fun findResourcesByName(search: String) {
         if (search.length < 2) {
             homeUiState = HomeUiState.StartSearch
         } else {
@@ -43,9 +47,7 @@ class HomeViewModel @Inject constructor(
                         .first()
                         .map { resource ->
                             resource.toResourceDetails().apply {
-                                isFavorite =
-                                    userPreferencesRepository.isFavorite(this.url).firstOrNull()
-                                        ?: false
+                                isFavorite = userPreferencesRepository.userFavoritesFlow.first().contains(resource)
                             }
                         }
                 )
@@ -55,14 +57,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun updateFavoritesResources(resource: ResourceDetails) {
+    fun changeFavoritesResources(resourceDetails: ResourceDetails) {
         viewModelScope.launch {
-            userPreferencesRepository.updateFavoritesResources(resource.url)
+            userPreferencesRepository.changeFavoritesResource(resourceDetails.toResource())
         }
         val resources = (homeUiState as HomeUiState.Success).resources.toMutableList().apply {
             set(
-                indexOfFirst { it.url == resource.url },
-                resource.copy(isFavorite = !resource.isFavorite)
+                indexOfFirst { it.url == resourceDetails.url },
+                resourceDetails.copy(isFavorite = !resourceDetails.isFavorite)
             )
         }
         homeUiState = HomeUiState.Success(resources)
@@ -74,6 +76,14 @@ interface ResourceDetails {
     var isFavorite: Boolean
 
     fun copy(isFavorite: Boolean = this.isFavorite): ResourceDetails
+    fun toResource(): Resource
+
+    companion object : ResourceDetails {
+        override val url = ""
+        override var isFavorite = false
+        override fun copy(isFavorite: Boolean): ResourceDetails = this
+        override fun toResource(): Resource = Resource
+    }
 }
 
 data class StarshipDetails(
@@ -92,21 +102,36 @@ data class StarshipDetails(
         url = url,
         isFavorite = isFavorite
     )
+
+    override fun toResource(): Resource = Starship(
+        name =  name,
+        model = model,
+        manufacturer = manufacturer,
+        passengers = passengers.toString(),
+        url = url
+    )
 }
 
 data class HeroDetails(
     val name: String,
     val gender: String,
-    val numberStarships: Int,
+    val starships: List<String>,
     override val url: String,
     override var isFavorite: Boolean = false
 ) : ResourceDetails {
     override fun copy(isFavorite: Boolean) = HeroDetails(
         name = name,
         gender = gender,
-        numberStarships = numberStarships,
+        starships = starships,
         url = url,
         isFavorite = isFavorite
+    )
+
+    override fun toResource() = Hero(
+        name = name,
+        gender =gender,
+        starships = starships,
+        url = url
     )
 }
 
@@ -124,6 +149,13 @@ data class PlanetDetails(
         url = url,
         isFavorite = isFavorite
     )
+
+    override fun toResource() = Planet(
+        name = name,
+        diameter = diameter.toString(),
+        population = population.toString(),
+        url = url
+    )
 }
 
 data class FilmDetails(
@@ -139,5 +171,12 @@ data class FilmDetails(
         producer = producer,
         url = url,
         isFavorite = isFavorite
+    )
+
+    override fun toResource() = Film(
+        title = title,
+        director = director,
+        producer = producer,
+        url = url
     )
 }

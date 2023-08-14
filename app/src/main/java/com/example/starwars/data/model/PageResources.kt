@@ -1,4 +1,4 @@
-package com.example.starwars.network.resources
+package com.example.starwars.data.model
 
 import kotlinx.serialization.Serializable
 

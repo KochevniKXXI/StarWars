@@ -1,7 +1,8 @@
 package com.example.starwars.data
 
+import com.example.starwars.data.model.Film
 import com.example.starwars.network.StarWarsApiService
-import com.example.starwars.network.resources.Resource
+import com.example.starwars.data.model.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -14,6 +15,7 @@ enum class Resources {
 
 interface StarWarsRepository {
     fun getResourcesStream(search: String): Flow<List<Resource>>
+    fun getFilms(listUrl: List<String>): Flow<List<Film>>
 }
 
 class NetworkStarWarsRepository @Inject constructor(
@@ -32,5 +34,12 @@ class NetworkStarWarsRepository @Inject constructor(
                 } while (request.next != null)
             }
             emit(listStarship)
+        }
+
+    override fun getFilms(listUrl: List<String>): Flow<List<Film>> =
+        flow {
+            listUrl.forEach { url ->
+                starWarsApiService
+            }
         }
 }

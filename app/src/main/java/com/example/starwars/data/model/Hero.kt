@@ -1,9 +1,11 @@
-package com.example.starwars.network.resources
+package com.example.starwars.data.model
 
-import com.example.starwars.ui.home.HeroDetails
+import com.example.starwars.ui.search.HeroDetails
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("hero")
 data class Hero(
     val name: String,
     val gender: String,
@@ -13,7 +15,7 @@ data class Hero(
     override fun toResourceDetails() = HeroDetails(
         name = name,
         gender = gender,
-        numberStarships = starships.size,
+        starships = starships,
         url = url
     )
 }

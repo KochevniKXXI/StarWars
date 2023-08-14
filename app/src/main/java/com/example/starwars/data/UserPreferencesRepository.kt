@@ -2,42 +2,49 @@ package com.example.starwars.data
 
 import android.util.Log
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
+import com.example.starwars.data.model.Resource
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 import java.io.IOException
 import javax.inject.Inject
 
 class UserPreferencesRepository @Inject constructor(
-    private val dataStore: DataStore<Preferences>,
+    private val dataStore: DataStore<List<Resource>>,
 ) {
 
     private companion object {
         const val TAG = "UserPreferencesRepository"
     }
 
-    fun isFavorite(resourceKey: String) = dataStore.data
+    val userFavoritesFlow: Flow<List<Resource>> = dataStore.data
         .catch {
             if (it is IOException) {
                 Log.e(TAG, "Ошибка чтения избранного.", it)
-                emit(emptyPreferences())
+                emit(listOf())
             } else {
                 throw it
             }
         }
-        .map { preferences ->
-            preferences[booleanPreferencesKey(resourceKey)]
-        }
 
-    suspend fun updateFavoritesResources(resourceKey: String) {
-        dataStore.edit { preferences ->
-            if (preferences[booleanPreferencesKey(resourceKey)] == null) {
-                preferences[booleanPreferencesKey(resourceKey)] = true
-            } else {
-                preferences.remove(booleanPreferencesKey(resourceKey))
+    suspend fun changeFavoritesResource(resource: Resource) {
+        if (userFavoritesFlow.first().contains(resource)) {
+            removeResource(resource)
+        } else {
+            dataStore.updateData {
+                buildList {
+                    addAll(it)
+                    add(resource)
+                }
+            }
+        }
+    }
+
+    suspend fun removeResource(resource: Resource) {
+        dataStore.updateData {
+            buildList {
+                addAll(it)
+                remove(resource)
             }
         }
     }

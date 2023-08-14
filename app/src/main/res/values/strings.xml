@@ -20,4 +20,6 @@
     <string name="not_available">н/д</string>
     <string name="unknown">неизвестно</string>
     <string name="no_results">По вашему запросу ничего не найдено</string>
+    <string name="delete_from_favorites">Удалить из избранного</string>
+    <string name="no_favorites">Вы ещё не сохраняли избранное</string>
 </resources>

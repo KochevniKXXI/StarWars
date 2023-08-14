@@ -1,9 +1,11 @@
-package com.example.starwars.network.resources
+package com.example.starwars.data.model
 
-import com.example.starwars.ui.home.PlanetDetails
+import com.example.starwars.ui.search.PlanetDetails
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("planet")
 data class Planet(
     val name: String,
     val diameter: String,
