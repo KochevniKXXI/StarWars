@@ -11,7 +11,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
-private const val BASE_URL = "https://swapi.dev/api/"
+const val BASE_URL = "https://swapi.dev/api/"
 
 private val json = Json {
     ignoreUnknownKeys = true

@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
-import com.example.starwars.data.serializers.UserFavoritesSerializer
 import com.example.starwars.data.model.Resource
+import com.example.starwars.data.serializers.UserFavoritesSerializer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,7 +21,7 @@ object DataStoreModule {
 
     @Provides
     @Singleton
-    fun provideProtoDataStore(@ApplicationContext context: Context): DataStore<List<Resource>> {
+    fun provideProtoDataStore(@ApplicationContext context: Context): DataStore<Set<Resource>> {
         return DataStoreFactory.create(
             serializer = UserFavoritesSerializer,
             produceFile = { context.dataStoreFile(DATA_STORE_FILENAME) }

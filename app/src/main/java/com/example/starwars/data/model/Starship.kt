@@ -11,6 +11,7 @@ data class Starship(
     val model: String,
     val manufacturer: String,
     val passengers: String,
+    val films: List<String>,
     override val url: String
 ) : Resource {
     override fun toResourceDetails() = StarshipDetails(
@@ -18,6 +19,7 @@ data class Starship(
         model = model,
         manufacturer = manufacturer,
         passengers = passengers.toIntOrNull(),
+        films = films,
         url = url
     )
 }

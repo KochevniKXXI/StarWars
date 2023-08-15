@@ -59,7 +59,7 @@ class SearchViewModel @Inject constructor(
 
     fun changeFavoritesResources(resourceDetails: ResourceDetails) {
         viewModelScope.launch {
-            userPreferencesRepository.changeFavoritesResource(resourceDetails.toResource())
+            userPreferencesRepository.changeFavoritesResources(resourceDetails.toResource())
         }
         val resources = (homeUiState as HomeUiState.Success).resources.toMutableList().apply {
             set(
@@ -91,6 +91,7 @@ data class StarshipDetails(
     val model: String,
     val manufacturer: String,
     val passengers: Int?,
+    val films: List<String>,
     override val url: String,
     override var isFavorite: Boolean = false
 ) : ResourceDetails {
@@ -99,6 +100,7 @@ data class StarshipDetails(
         model = model,
         manufacturer = manufacturer,
         passengers = passengers,
+        films = films,
         url = url,
         isFavorite = isFavorite
     )
@@ -108,6 +110,7 @@ data class StarshipDetails(
         model = model,
         manufacturer = manufacturer,
         passengers = passengers.toString(),
+        films = films,
         url = url
     )
 }
@@ -116,6 +119,7 @@ data class HeroDetails(
     val name: String,
     val gender: String,
     val starships: List<String>,
+    val films: List<String>,
     override val url: String,
     override var isFavorite: Boolean = false
 ) : ResourceDetails {
@@ -123,6 +127,7 @@ data class HeroDetails(
         name = name,
         gender = gender,
         starships = starships,
+        films = films,
         url = url,
         isFavorite = isFavorite
     )
@@ -131,6 +136,7 @@ data class HeroDetails(
         name = name,
         gender =gender,
         starships = starships,
+        films = films,
         url = url
     )
 }
@@ -139,6 +145,7 @@ data class PlanetDetails(
     val name: String,
     val diameter: Int?,
     val population: Long?,
+    val films: List<String>,
     override val url: String,
     override var isFavorite: Boolean = false
 ) : ResourceDetails {
@@ -146,6 +153,7 @@ data class PlanetDetails(
         name = name,
         diameter = diameter,
         population = population,
+        films = films,
         url = url,
         isFavorite = isFavorite
     )
@@ -154,6 +162,7 @@ data class PlanetDetails(
         name = name,
         diameter = diameter.toString(),
         population = population.toString(),
+        films = films,
         url = url
     )
 }

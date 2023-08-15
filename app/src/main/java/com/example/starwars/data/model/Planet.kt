@@ -10,12 +10,14 @@ data class Planet(
     val name: String,
     val diameter: String,
     val population: String,
+    val films: List<String>,
     override val url: String
 ) : Resource {
     override fun toResourceDetails() = PlanetDetails(
         name = name,
         diameter = diameter.toIntOrNull(),
         population = population.toLongOrNull(),
+        films = films,
         url = url
     )
 }

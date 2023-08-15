@@ -183,6 +183,7 @@ fun ResourceListItem(
                     is StarshipDetails -> resource.name
                     is HeroDetails -> resource.name
                     is PlanetDetails -> resource.name
+                    is FilmDetails -> resource.title
                     else -> ""
                 }
             )
@@ -262,6 +263,11 @@ private fun ResourceSupportingContent(
                         }
                     )
                 )
+            }
+
+            is FilmDetails -> {
+                Text(text = stringResource(id = R.string.director, resource.director))
+                Text(text = stringResource(id = R.string.producer, resource.producer))
             }
 
             else -> {}

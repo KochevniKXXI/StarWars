@@ -1,5 +1,6 @@
 package com.example.starwars.network
 
+import com.example.starwars.data.model.Film
 import com.example.starwars.data.model.PageResources
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -10,5 +11,5 @@ interface StarWarsApiService {
     suspend fun getPageResources(@Path("type") type: String, @Query("search") search: String, @Query("page") page: Int): PageResources
 
     @GET("{path}")
-    suspend fun getResource(@Path("path") path: String)
+    suspend fun getFilms(@Path("path") path: String): Film
 }
